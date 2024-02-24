@@ -1,0 +1,11 @@
+"Juris","FULLNAME","RoadSegmentID","KC_FCC","RoadMiles","TrafficIntensity","HeavyVehicleCount","MediumVehicleCount","GenScore","RoadwaySkirtImperviousness","RoadwayDrainage","PctConveyed","RoadwayConnectednessScore","TotalScore"
+"WSDOT","RAMP","RAMP-62710","Freeway",0.3,28676,667,1751,4.62,88,"Piped",100,-0.09,4.53
+"King County","16TH AVE SW","16TH-11076","Minor",0.1,27000,175,740,4.5,98,"Piped",100,0,4.5
+"King County","MARTIN LUTHER KING JR WAY S","MARTIN LUTHER KING JR-44293","Primary",0.1,47840,711,3059,4.83,65,"Piped",100,-0.35,4.48
+"King County","5TH AVE S","5TH-30001","Primary",0.4,28676,667,1751,4.62,90,"Piped",81,-0.18,4.44
+"King County","S 129TH ST","129TH-63909","Collector",0,47840,711,3013,4.83,52,"Piped",100,-0.54,4.29
+"King County","MILITARY RD S","MILITARY-44726","Minor",0.1,77442,4274,4431,5.1,42,"Piped",80,-0.82,4.28
+"King County","16TH AVE SW","16TH-11071","Minor",0.1,18112,29,242,4.29,95,"Piped",100,-0.04,4.25
+"King County","17TH AVE SW","17TH-12275","Primary",0.1,20550,199,509,4.39,84,"Piped",100,-0.14,4.25
+"King County","16TH AVE SW","16TH-11081","Primary",0.1,18112,29,242,4.29,90,"Piped",100,-0.08,4.21
+"King County","S 288TH ST","288TH-66471","Minor",0.3,89279,9917,6988,5.27,28,"Piped",100,-1.06,4.21
