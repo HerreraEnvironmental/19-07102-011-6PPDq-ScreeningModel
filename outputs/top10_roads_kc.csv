@@ -1,0 +1,11 @@
+"JurisFinal","FULLNAME","RoadSegmentID","KC_FCC","RoadMiles","TrafficIntensity","HeavyVehicleCount","MediumVehicleCount","GenScore","RoadwaySkirtImperviousness","RoadwayDrainage","PctConveyed","RoadwayConnectednessScore","TotalScore"
+"King County","16TH AVE SW","16TH-11076","Minor",0.1,27000,175,740,4.5,98,"None",100,0,4.5
+"King County","MARTIN LUTHER KING JR WAY S","MARTIN LUTHER KING JR-44293","Primary",0.1,47840,711,3059,4.83,65,"Piped",100,-0.35,4.48
+"King County","SW ROXBURY ST","ROXBURY-85975","Primary",0.1,27000,199,740,4.5,94,"None",100,-0.04,4.46
+"King County","SW ROXBURY ST","ROXBURY-85974","Primary",0.1,27000,175,740,4.5,84,"None",100,-0.14,4.36
+"King County","NE 145TH ST","145TH-50180","Primary",0.1,87809,4996,6705,5.19,35,"Piped",100,-0.88,4.31
+"King County","S 129TH ST","129TH-63909","Collector",0,47840,711,3013,4.83,52,"Piped",100,-0.54,4.29
+"King County","SW ROXBURY ST","ROXBURY-85993","Primary",0.1,28444,175,788,4.53,75,"None",100,-0.24,4.29
+"King County","16TH AVE SW","16TH-11071","Minor",0.1,18112,29,242,4.29,95,"None",100,-0.04,4.25
+"King County","17TH AVE SW","17TH-12275","Primary",0.1,20550,199,509,4.39,84,"None",100,-0.14,4.25
+"King County","16TH AVE SW","16TH-11081","Primary",0.1,18112,29,242,4.29,90,"None",100,-0.08,4.21

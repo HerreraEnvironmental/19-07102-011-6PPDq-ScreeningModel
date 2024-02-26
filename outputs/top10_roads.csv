@@ -1,11 +1,11 @@
-"Juris","FULLNAME","RoadSegmentID","KC_FCC","RoadMiles","TrafficIntensity","HeavyVehicleCount","MediumVehicleCount","GenScore","RoadwaySkirtImperviousness","RoadwayDrainage","PctConveyed","RoadwayConnectednessScore","TotalScore"
-"WSDOT","RAMP","RAMP-62710","Freeway",0.3,28676,667,1751,4.62,88,"Piped",100,-0.09,4.53
-"King County","16TH AVE SW","16TH-11076","Minor",0.1,27000,175,740,4.5,98,"Piped",100,0,4.5
-"King County","MARTIN LUTHER KING JR WAY S","MARTIN LUTHER KING JR-44293","Primary",0.1,47840,711,3059,4.83,65,"Piped",100,-0.35,4.48
-"King County","5TH AVE S","5TH-30001","Primary",0.4,28676,667,1751,4.62,90,"Piped",81,-0.18,4.44
-"King County","S 129TH ST","129TH-63909","Collector",0,47840,711,3013,4.83,52,"Piped",100,-0.54,4.29
-"King County","MILITARY RD S","MILITARY-44726","Minor",0.1,77442,4274,4431,5.1,42,"Piped",80,-0.82,4.28
-"King County","16TH AVE SW","16TH-11071","Minor",0.1,18112,29,242,4.29,95,"Piped",100,-0.04,4.25
-"King County","17TH AVE SW","17TH-12275","Primary",0.1,20550,199,509,4.39,84,"Piped",100,-0.14,4.25
-"King County","16TH AVE SW","16TH-11081","Primary",0.1,18112,29,242,4.29,90,"Piped",100,-0.08,4.21
-"King County","S 288TH ST","288TH-66471","Minor",0.3,89279,9917,6988,5.27,28,"Piped",100,-1.06,4.21
+"JurisFinal","FULLNAME","RoadSegmentID","KC_FCC","RoadMiles","TrafficIntensity","HeavyVehicleCount","MediumVehicleCount","GenScore","RoadwaySkirtImperviousness","RoadwayDrainage","PctConveyed","RoadwayConnectednessScore","TotalScore"
+"WSDOT","I-5 FWY","I-5-41998","Freeway",0.1,75957,9499,6121,5.22,100,"Piped",100,0.01,5.23
+"WSDOT","I-5 FWY","I-5-41925","Freeway",0.2,92253,4970,7060,5.2,100,"Piped",100,0.01,5.21
+"WSDOT","RAMP","RAMP-62219","Freeway",0.1,92253,4970,7060,5.2,100,"Piped",100,0.01,5.21
+"WSDOT","I-5 FWY","I-5-41897","Freeway",0.7,124445,3945,8442,5.28,95,"Piped",74,-0.16,5.12
+"WSDOT","RAMP","RAMP-62178","Freeway",0.1,60975,3536,4790,5.03,100,"Piped",100,0.01,5.04
+"WSDOT","I-5 FWY","I-5-41960","Freeway",0.4,92253,4970,7060,5.2,78,"Piped",100,-0.2,5
+"WSDOT","RAMP","RAMP-62613","Freeway",0.1,76621,3068,5320,5.09,95,"Piped",65,-0.21,4.88
+"WSDOT","I-5 FWY","I-5-41911","Freeway",0.2,92253,4970,7060,5.2,100,"Piped",41,-0.37,4.83
+"WSDOT","RAMP","RAMP-62164","Freeway",0.3,76621,3068,5320,5.09,92,"Piped",62,-0.26,4.83
+"WSDOT","RAMP","RAMP-62610","Freeway",0.2,123962,4048,7428,5.27,57,"Piped",100,-0.46,4.81
