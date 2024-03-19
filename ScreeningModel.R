@@ -38,6 +38,8 @@ st_address_juris<-st_address %>%
 #we should add somethign for bridges
 
 kc_roads_SM<-read_excel('inputs/KC_Street_Address_SummaryAttributes_20240223_v2.xlsx') %>%
+  left_join(ditch_estimates) %>%
+  mutate(DitchLen_FT=as.numeric(DitchLength)) %>%
   transmute(OBJECTID,
             FRADDL,FRADDR,TOADDL,TOADDR,FULLNAME,
             RoadSegmentID,
@@ -57,12 +59,12 @@ kc_roads_SM<-read_excel('inputs/KC_Street_Address_SummaryAttributes_20240223_v2.
              OpenConvey=Ditch|Swales|Streams,
              ClosedConvey=Pipe,
              Convey=OpenConvey|ClosedConvey,
-             ConveyType=case_when(Pipe==1~'Piped',
-                                  Swales==1~'Swale',
-                                  Ditch==1~'Ditched',
-                                  Streams==1~'Stream',
-                                  T~'None') %>% factor(levels=c('None','Ditched','Swale','Stream','Piped')),
             across(PipeLen_FT:StreamLen_FT ,function(x) ifelse(is.na(x),0,as.numeric(x))),
+             ConveyType=case_when(DitchLen_FT>0~'Ditched',
+                                  PipeLen_FT>0~'Piped',
+                                  SwaleLen_FT>0~'Swale',
+                                  StreamLen_FT>0~'Stream',
+                                  T~'None') %>% factor(levels=c('None','Ditched','Swale','Stream','Piped')),
             ConveyLen_FT=(PipeLen_FT +DitchLen_FT+SwaleLen_FT+StreamLen_FT),
             PctConveyed=ConveyLen_FT/Shape_Leng*100,
             PctConveyed=ifelse(PctConveyed>100,100,PctConveyed),
@@ -255,7 +257,31 @@ plot_convey_imp<-kc_roads_SM %>%
   theme_bw()
 ggsave('plots/imperviousness_by_conveyance_FCC.png',plot_convey_imp,scale=0.8,width=10,height=4.5)
 
+plot_convey_type<-kc_roads_SM %>%
+  filter(ConveyType!='Stream') %>%
+  ggplot(aes(RdSkirtPctImp,fill=ConveyType))+
+  geom_density(alpha=.5)+
+  facet_wrap(~KC_FCC,scales = 'free_y')+
+  theme_bw()+
+  scale_x_continuous('Road Skirt Imperviousness (%)')#+
+  # scale_y_log10('count',limits=c(1,NA),
+  #               labels=scales::label_number(scale_cut = scales::cut_short_scale()),
+  #               minor_breaks=c(1:10,10*1:10,100*1:10,1000*1:10))
+ggsave('plots/conveyance_by_type_FCC.png',plot_convey_type,scale=0.8,width=10,height=4.5)
 
+plot_convey_type_impcat<-kc_roads_SM %>%
+  mutate(ImpervCat=ifelse(is.na(RdSkirtPctImp)|RdSkirtPctImp<25,'<25%',
+         ifelse(RdSkirtPctImp<50,'>=25 to 50%','>=50%'))) %>%
+  filter(ConveyType!='Stream') %>%
+  ggplot()+
+  geom_bar(aes(x=ImpervCat,y=after_stat(count),fill=ConveyType,group=ConveyType))+
+  facet_wrap(~KC_FCC,
+             scales='free_y')+
+  scale_x_discrete('Imperviousness Range')+
+  scale_y_continuous('Count (# Segments)')+
+  scale_fill_discrete('Conveyance Type')+
+  theme_bw()
+ggsave('plots/conveyance_by_type_FCC_impcat.png',plot_convey_type_impcat,scale=0.8,width=10,height=4.5)
 
 library(leaflet)
 
@@ -277,7 +303,13 @@ kc_roads_score_alternative<-kc_roads_SM %>%
             RoadwayConnectednessScore=round(ImpScore+ConveyScore,2),
             TotalScore=(GenScore+RoadwayConnectednessScore),
            TotalScore=ifelse(TotalScore<0,0,TotalScore)
-  )
+  ) %>%
+  mutate(ScorePercentile=round(100*rank(TotalScore)/n(),1))
+
+example_score_segment_id<-c('16TH-11076','208TH-15051','FALL CITY-CARNATION-40224','PRESTON-FALL CITY-61575',
+                            'UNION HILL-58754','I-5-41872','SR 18-81753','RAMP-62710')
+kc_roads_score_alternative %>% 
+  filter(RoadSegmentID %in% example_score_segment_id)
 
 plot_ecdf_Scores<-kc_roads_score_alternative %>%
   ggplot(aes(TotalScore,col=KC_FCC,group=KC_FCC))+
