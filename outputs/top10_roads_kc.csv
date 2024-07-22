@@ -1,11 +1,11 @@
-"JurisFinal","FULLNAME","RoadSegmentID","KC_FCC","RoadMiles","TrafficIntensity","HeavyVehicleCount","MediumVehicleCount","GenScore","RoadwaySkirtImperviousness","RoadwayDrainage","PctConveyed","RoadwayConnectednessScore","TotalScore"
-"King County","16TH AVE SW","16TH-11076","Minor",0.1,27000,175,740,4.5,98,"None",100,0,4.5
-"King County","MARTIN LUTHER KING JR WAY S","MARTIN LUTHER KING JR-44293","Primary",0.1,47840,711,3059,4.83,65,"Piped",100,-0.35,4.48
-"King County","SW ROXBURY ST","ROXBURY-85975","Primary",0.1,27000,199,740,4.5,94,"None",100,-0.04,4.46
-"King County","SW ROXBURY ST","ROXBURY-85974","Primary",0.1,27000,175,740,4.5,84,"None",100,-0.14,4.36
-"King County","NE 145TH ST","145TH-50180","Primary",0.1,87809,4996,6705,5.19,35,"Piped",100,-0.88,4.31
-"King County","S 129TH ST","129TH-63909","Collector",0,47840,711,3013,4.83,52,"Piped",100,-0.54,4.29
-"King County","SW ROXBURY ST","ROXBURY-85993","Primary",0.1,28444,175,788,4.53,75,"None",100,-0.24,4.29
-"King County","16TH AVE SW","16TH-11071","Minor",0.1,18112,29,242,4.29,95,"None",100,-0.04,4.25
-"King County","17TH AVE SW","17TH-12275","Primary",0.1,20550,199,509,4.39,84,"None",100,-0.14,4.25
-"King County","16TH AVE SW","16TH-11081","Primary",0.1,18112,29,242,4.29,90,"None",100,-0.08,4.21
+"Juris","FULLNAME","KC_FCC","RoadMiles","TrafficIntensity","HeavyVehicleCount","MediumVehicleCount","PV_LT_Count","GenScore","RoadwaySkirtImperviousness","RoadwaySkirtOverWater","RoadwayDrainage","PctConveyed","StreamWaterCrossing","RoadwayConnectednessScore","TotalScore","No_SW_Score","ScorePercentile","No_SW_ScorePercentile"
+"King County","SE PETROVITSKY RD","Primary",0.2,26020,365,582,25072.5321580437,4.51,57,0,"Ditched",100,0,-0.23,4.28,3.28,99.4,98.5
+"King County","16TH AVE S","Primary",0.5,18667,149,1124,17395.1404137476,4.37,78,14.5354176411399,"Ditched",100,1,-0.1,4.27,4.27,99.4,99.9
+"King County","16TH AVE SW","Primary",0.1,22201,78,437,21685.6791147914,4.41,68,0,"Piped",100,0,-0.16,4.25,3.25,99.3,98.3
+"King County","SW ROXBURY ST","Primary",0.1,18856,176,457,18223.3583130954,4.36,71,0,"Piped",100,0,-0.14,4.22,3.22,99.3,98.1
+"King County","SW ROXBURY ST","Primary",0.1,28722,162,804,27756.3135973694,4.54,46,0,"Ditched",100,0,-0.32,4.22,3.21,99.2,98
+"King County","140TH AVE SE","Primary",0.1,27410,79,760,26571.2700636528,4.51,49,0,"Piped",100,0,-0.3,4.21,3.21,99.2,98
+"King County","16TH AVE SW","Primary",0.1,14836,25,199,14612.2203099892,4.23,89,0,"Ditched",100,0,-0.04,4.19,3.18,99.1,97.8
+"King County","S 277TH ST","Minor",0.2,34491,122,1020,33349.4857879243,4.61,37,0,"Ditched",100,1,-0.42,4.19,4.19,99.1,99.9
+"King County","SW ROXBURY ST","Primary",0.1,13356,129,364,12862.3752587258,4.21,94,0,"Piped",100,0,-0.02,4.19,3.19,99.1,97.9
+"King County","140TH AVE SE","Primary",0.2,26546,16,776,25753.6981537999,4.49,47,0,"Ditched",100,0,-0.31,4.18,3.17,99.1,97.8

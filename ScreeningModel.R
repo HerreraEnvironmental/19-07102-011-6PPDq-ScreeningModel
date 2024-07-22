@@ -11,37 +11,43 @@ library(cowplot)
 # # 
 # # zip('outputs/emme_links_project.zip',list.files('outputs/','emme',full.names = T))
 # 
-st_address<-st_read(paste0("https://gisdata.kingcounty.gov/arcgis/rest/services/",
-                           "OpenDataPortal/transportation__st_address_line/MapServer/108/query?outFields=*&where=1%3D1&f=geojson"))
+# st_address<-st_read(paste0("https://gisdata.kingcounty.gov/arcgis/rest/services/",
+#                            "OpenDataPortal/transportation__st_address_line/MapServer/108/query?outFields=*&where=1%3D1&f=geojson"))
+# 
+# st_address_ID<-st_address%>%
+#   group_by(ST_NAME) %>%
+#   mutate(RoadSegmentID=paste0(ST_NAME,'-',1:n()))
 # NOTE OBJECT IDs are different between st_address and the KC_RAODS
-jurisdictions<-st_read(paste0("https://gisdata.kingcounty.gov/arcgis/rest/",
-                          "services/OpenDataPortal/admin___base/MapServer/",
-                          "446/query?outFields=*&where=1%3D1&f=geojson"))
-st_address_juris<-st_address %>%
-  select(FRADDL:FULLNAME,Shape_Length) %>%
-  st_join(jurisdictions %>% select(CITYNAME)) %>%
-  mutate(JurisFROMJOIN=ifelse(grepl('FWY|SR|RAMP',FULLNAME),'WSDOT',CITYNAME)) %>%
-  filter(!grepl('.',row.names(.),fixed = T))
+# st_address %>%
+#   slice(1:10000)  %>%
+#   select(OBJECTID:DIRSUFFIX,RoadSegmentID) %>%
+#   arrange(RoadSegmentID)
+# 
+# jurisdictions<-st_read(paste0("https://gisdata.kingcounty.gov/arcgis/rest/",
+#                           "services/OpenDataPortal/admin___base/MapServer/",
+#                           "446/query?outFields=*&where=1%3D1&f=geojson"))
+# st_address_juris<-st_address %>%
+#   select(FRADDL:FULLNAME,Shape_Length) %>%
+#   st_join(jurisdictions %>% select(CITYNAME)) %>%
+#   mutate(JurisFROMJOIN=ifelse(grepl('FWY|SR|RAMP',FULLNAME),'WSDOT',CITYNAME)) %>%
+#   filter(!grepl('.',row.names(.),fixed = T))
 
+hec_gdb<-'\\\\herrera.local\\hecnet\\gis-k\\Projects\\Y2019\\19-07102-011\\Geodatabase\\GIS_Working\\WQBE6ppdq_20240717.gdb'
 
-#Issues, 
-#several cases with Local roads having far too high traffic, e.g., Road ID 78194
-#freeways sometime have local road numbers, e.g., ID 42074
-#Please add an intersection for Jurisdiction
-#Redmond Fall City Road has a verrrryyy low ADT & Fall City Snoqualmie is zero
-#chunk of fall city road disappears north of fall city
-#huge drop in SR18 ADT at Covington way from 28,000 to 1700 per day
-# more traffic on SR18 then I5?
-#I90 west of mercer is 0 ADT?
+st_layers(hec_gdb)
 
-#Please provide the shapefile rather than an excel export
-#we should add somethign for bridges
-
-kc_roads_SM<-read_excel('inputs/KC_Street_Address_SummaryAttributes_20240223_v2.xlsx') %>%
-  left_join(ditch_estimates) %>%
-  mutate(DitchLen_FT=as.numeric(DitchLength)) %>%
-  transmute(OBJECTID,
-            FRADDL,FRADDR,TOADDL,TOADDR,FULLNAME,
+hec_gis_export<-
+#read_excel('inputs/KC_Street_Address_SummaryAttributes_20240223_v2.xlsx') %>%
+#read_excel('O:\\proj\\Y2019\\19-07102-011\\GIS\\KC_Street_Address_SummaryAttributes_20240718_v2.xlsx')
+ st_read(hec_gdb,
+         layer = 'King_County_St_Addresses_6PPDQ_Metrics_20240718')
+   
+kc_roads_SM<-
+  hec_gis_export %>%  
+  st_transform(4326) %>%
+ # left_join(ditch_estimates) %>%
+ # mutate(DitchLen_FT=as.numeric(DitchLength)) %>%
+  transmute(FRADDL,FRADDR,TOADDL,TOADDR,FULLNAME,
             RoadSegmentID,
             KC_FCC=factor(KC_FCC,levels=c('L','C','M','P','F'),
                        labels=c('Local','Collector','Minor','Primary','Freeway')),
@@ -56,6 +62,12 @@ kc_roads_SM<-read_excel('inputs/KC_Street_Address_SummaryAttributes_20240223_v2.
             GutterLen_FT =ifelse(is.na(GutterLen_FT ),0,GutterLen_FT ),
             PctGuttered=GutterLen_FT/Shape_Leng*100,
             RdSkirtPctImp=RdSkirtPctImpervious*100,
+    Grade,
+            RdSkirtPctOverwater=100*as.numeric(ifelse(is.na(RdSkirtPctOverwater),0,RdSkirtPctOverwater)),
+            StreamWaterCrossing=ifelse(is.na(StreamWaterCrossing),0,StreamWaterCrossing),
+    isRamp=ifelse(is.na(isRamp),0,isRamp),
+    isOverpass=ifelse(is.na(isOverpass),0,isOverpass),
+    isUnderpass=ifelse(is.na(isUnderpass),0,isUnderpass),
              OpenConvey=Ditch|Swales|Streams,
              ClosedConvey=Pipe,
              Convey=OpenConvey|ClosedConvey,
@@ -71,14 +83,14 @@ kc_roads_SM<-read_excel('inputs/KC_Street_Address_SummaryAttributes_20240223_v2.
             BusTraffic =ifelse(is.na(BusTraffic ),0,BusTraffic ),
             Shape_Length=Shape_Leng,
              RoadMiles=Shape_Leng/5280
-         ) %>%
-  right_join(st_address_juris %>% select(FRADDL:FULLNAME,Shape_Length,JurisFROMJOIN),.) %>%
-  mutate(JurisFinal=ifelse(Juris=='WSDOT',Juris,JurisFROMJOIN)) %>%
-  filter(JurisFinal %in% c('WSDOT','King County') ) %>%
-  arrange(OBJECTID)
+         ) #%>%
+  #right_join(st_address_juris %>% select(FRADDL:FULLNAME,Shape_Length,JurisFROMJOIN),.) %>%
+  #mutate(JurisFinal=ifelse(Juris=='WSDOT',Juris,JurisFROMJOIN)) #%>%
+ # filter(JurisFinal %in% c('WSDOT','King County') ) %>%
+ # arrange(OBJECTID)
   
-nrow(kc_roads_SM) #16766
-nrow(st_address) #89371
+nrow(kc_roads_SM) #89309
+#nrow(st_address) #89458
 
 kc_roads_SM %>%
   st_drop_geometry() %>%
@@ -95,6 +107,7 @@ kc_roads_SM %>%
            # HeavyVehicleRoadMiles=sum(RoadMiles*HeavyVehicle,na.rm=T),
          #   RoadMilesConvey=sum(RoadMiles*Convey,na.rm=T),
             PctConveyed=mean(PctConveyed,na.rm=T),
+            PctOverwater=mean(RdSkirtPctOverwater,na.rm=T),
             RdSkirtPctImp=mean(RdSkirtPctImp,na.rm=T)) %>%
   write.csv('outputs/kc_wsdot_roads_summar.csv',row.names = F)
 
@@ -285,26 +298,40 @@ ggsave('plots/conveyance_by_type_FCC_impcat.png',plot_convey_type_impcat,scale=0
 
 library(leaflet)
 
-#alternative scoring could be done so that the bins aren't artificially lost
-#e.g., (log10(Traffic*x*log10(HvyVeh))+log10(Connectedness)
+#add in multipliers for emission factor rates
+multiplier_PV_LT<-1.12
+multiplier_mediumVehicle<-2.42
+multiplier_heavyVehicle<-7.83
+
 kc_roads_score_alternative<-kc_roads_SM %>%
-  transmute(OBJECTID,JurisFinal,FULLNAME,RoadSegmentID,KC_FCC,
+  transmute(RoadSegmentID,
+            Juris,
+            FULLNAME,RoadSegmentID,KC_FCC,
             RoadMiles,
             TrafficIntensity=ifelse(is.na(ADT_PSRC),1,ADT_PSRC),
-            HeavyVehicleCount=ifelse(is.na(HeavyVehicle),1,HeavyVehicle),
-            MediumVehicleCount=ifelse(is.na(MediumVehicle),1,MediumVehicle),
-            GenScore=round(log10(TrafficIntensity+5*MediumVehicleCount+6.4*HeavyVehicleCount+1),2),
+            HeavyVehicleCount=ifelse(is.na(HeavyVehicle),0,HeavyVehicle),
+            MediumVehicleCount=ifelse(is.na(MediumVehicle),0,MediumVehicle),
+            PV_LT_Count=TrafficIntensity-HeavyVehicleCount-MediumVehicleCount,
+            GenScore=round(log10(multiplier_PV_LT*PV_LT_Count+
+                                   multiplier_mediumVehicle*MediumVehicleCount+
+                                   multiplier_heavyVehicle*HeavyVehicleCount+
+                                   1),2),
             GenScore=ifelse(is.na(GenScore),0,GenScore),
-            RoadwaySkirtImperviousness=ifelse(is.na(RdSkirtPctImp),RdSkirtPctImp[-1],RdSkirtPctImp),
+            RoadwaySkirtImperviousness=RdSkirtPctImp,
+            RoadwaySkirtOverWater=RdSkirtPctOverwater,
             RoadwayDrainage=ConveyType,
             PctConveyed,
-            ImpScore=log10(((RoadwaySkirtImperviousness/100+0.01))^2),
-            ConveyScore=log10(PctConveyed/100+.01),
+            StreamWaterCrossing,
+            ImpScore=log10((RoadwaySkirtImperviousness+1)/100), #note that imperviousness is inclusive of water surface
+            ConveyScore=ifelse(StreamWaterCrossing==1,0,log10((PctConveyed+1)/100)),
             RoadwayConnectednessScore=round(ImpScore+ConveyScore,2),
             TotalScore=(GenScore+RoadwayConnectednessScore),
-           TotalScore=ifelse(TotalScore<0,0,TotalScore)
+           TotalScore=ifelse(TotalScore<0,0,TotalScore),
+           No_SW_Score=round(ImpScore+GenScore+ifelse(StreamWaterCrossing,0,-1),2),
+           No_SW_Score=ifelse(No_SW_Score<0,0,No_SW_Score)
   ) %>%
-  mutate(ScorePercentile=round(100*rank(TotalScore)/n(),1))
+  mutate(ScorePercentile=round(100*rank(TotalScore)/n(),1),
+         No_SW_ScorePercentile=round(100*rank(No_SW_Score)/n(),1))
 
 example_score_segment_id<-c('16TH-11076','208TH-15051','FALL CITY-CARNATION-40224','PRESTON-FALL CITY-61575',
                             'UNION HILL-58754','I-5-41872','SR 18-81753','RAMP-62710')
@@ -340,40 +367,69 @@ ggsave('plots/plot_jitter_Scores_antiLog.png',plot_jitter_Scores_antiLog,scale=0
 top10_scores<-arrange(kc_roads_score_alternative,desc(TotalScore)) %>% st_drop_geometry()%>%slice(1:10) %>%
   mutate(RoadMiles=round(RoadMiles,1),
          across(c(TrafficIntensity:MediumVehicleCount,RoadwaySkirtImperviousness,PctConveyed),round)) %>%
-  select(-ImpScore,-ConveyScore,-OBJECTID) 
+  select(-ImpScore,-ConveyScore,-RoadSegmentID) 
 top10_scores%>%
   write.csv('outputs/top10_roads.csv',row.names = F)
 
 top10_scores_KC<-kc_roads_score_alternative %>%
-  filter(JurisFinal=='King County') %>%
+  filter(Juris=='King County') %>%
   arrange(desc(TotalScore)) %>% 
   st_drop_geometry()%>%
   slice(1:10) %>%
   mutate(RoadMiles=round(RoadMiles,1),
          across(c(TrafficIntensity:MediumVehicleCount,RoadwaySkirtImperviousness,PctConveyed),round)) %>%
-  select(-ImpScore,-ConveyScore,-OBJECTID) 
+  select(-ImpScore,-ConveyScore,-RoadSegmentID) 
 top10_scores_KC%>%
   write.csv('outputs/top10_roads_kc.csv',row.names = F)
 
 kc_roads_score_alternative %>%
-  st_write('outputs/kc_roads_scored.shp',append = F)
-zip('outputs/kc_roads_scored.zip',list.files('outputs','kc_roads_scored',full.names = T))
+  st_write('outputs/GIS/kc_roads_scored.geojson',append = F)
+#zip('outputs/GIS/kc_roads_scored.zip',list.files('outputs','kc_roads_scored',full.names = T))
 
 pal_alt<-colorNumeric('RdYlBu',0:6,reverse=T)
 kc_roads_score_alternative %>% 
   filter(!st_is_empty(.)) %>%
   leaflet() %>%
   addProviderTiles('Esri.WorldImagery') %>%
-  addPolylines(color=~pal_alt(TotalScore),popup = ~paste(FULLNAME,RoadSegmentID,KC_FCC,JurisFinal,
+  addPolylines(color=~pal_alt(TotalScore),popup = ~paste(FULLNAME,RoadSegmentID,KC_FCC,
+                                                         paste('Juris from LOG:',Juris),
+                                                         #paste('Juris from Spatial Join:',JurisFinal),
                                                      paste('Total Score:',TotalScore),
                                                      paste('ADT:',round(TrafficIntensity)),
                                                      paste('Hvy Veh:',round(HeavyVehicleCount)),
                                                      paste('Med Veh:',round(MediumVehicleCount)),
                                                      paste('%Imp:',round(RoadwaySkirtImperviousness,0)),
+                                                     paste('%Wtr:',round(RoadwaySkirtOverWater,0)),
                                                      paste('Drainage:',RoadwayDrainage),
                                                      paste('%Conveyed:',round(PctConveyed,0)),
+                                                     paste('OverWater:',ifelse(StreamWaterCrossing==1,'Yes','No')),
                                                     # paste('Connectedness:',RoadwayConnectednessScore),
                                                      sep='<br>'),
+               opacity = 1) %>%
+  addLegend('bottomright',pal_alt,0:6,title='Screening Model\nScore')
+
+
+#top 10000 map:
+kc_roads_score_alternative %>% 
+  arrange(desc(TotalScore)) %>%
+  slice(1:10000)%>%
+  filter(!st_is_empty(.)) %>%
+  leaflet() %>%
+  addProviderTiles('Esri.WorldImagery') %>%
+  addPolylines(color=~pal_alt(TotalScore),popup = ~paste(FULLNAME,RoadSegmentID,KC_FCC,
+                                                         paste('Juris from LOG:',Juris),
+                                                        # paste('Juris from Spatial Join:',JurisFinal),
+                                                         paste('Total Score:',TotalScore),
+                                                         paste('ADT:',round(TrafficIntensity)),
+                                                         paste('Hvy Veh:',round(HeavyVehicleCount)),
+                                                         paste('Med Veh:',round(MediumVehicleCount)),
+                                                         paste('%Imp:',round(RoadwaySkirtImperviousness,0)),
+                                                         paste('%Wtr:',round(RoadwaySkirtOverWater,0)),
+                                                         paste('Drainage:',RoadwayDrainage),
+                                                         paste('%Conveyed:',round(PctConveyed,0)),
+                                                         paste('OverWater:',ifelse(StreamWaterCrossing==1,'Yes','No')),
+                                                         # paste('Connectedness:',RoadwayConnectednessScore),
+                                                         sep='<br>'),
                opacity = 1) %>%
   addLegend('bottomright',pal_alt,0:6,title='Screening Model\nScore')
 
@@ -389,45 +445,3 @@ kc_roads_score_alternative %>%
 
 #Map of Scores
 #zoom in too neighborhood
-
-#normalize by miles? how?
-
-#cluster analysis
-library(cluster)
-
-cluster_matrix<-kc_roads_SM %>%
-  st_drop_geometry() %>%
- # filter(KC_FCC!='Local') %>%
-  transmute(RoadSegmentID,KC_FCC,
-    ADT_PSRC=sqrt(ADT_PSRC),
-         HeavyVehicle=sqrt(HeavyVehicle),
-         RdSkirtPctImp=sqrt(RdSkirtPctImp),
-         PctConveyed=sqrt(PctConveyed)) %>%
-  na.omit() 
-row.names(cluster_matrix)<-cluster_matrix$RoadSegmentID
-cluster_fit<-cluster_matrix%>%
-  select(-RoadSegmentID,-KC_FCC) %>%
-  scale() %>%
-  kmeans(5)
-
-clusplot(cluster_matrix, 
-         cluster_fit$cluster, color=TRUE, shade=TRUE,
-         labels=2, lines=0)
-
-kc_roads_SM %>%
-  filter(grepl('STEVENS PASS',FULLNAME))
-
-library(mclust)
-#still using square roots from above
-X<-cluster_matrix %>% select(-KC_FCC,-RoadSegmentID) 
-class<-cluster_matrix$KC_FCC
-clPairs(X,class)
-BIC <- mclustBIC(X)
-plot(BIC)
-summary(BIC)
-
-mod1 <- Mclust(X, x = BIC,G=9)
-summary(mod1, parameters = TRUE)
-plot(mod1,what='classification')
-table(class, mod1$classification)
-

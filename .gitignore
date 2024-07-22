@@ -1,3 +1,5 @@
+#large_files
+outputs/GIS/
 # History files
 .Rhistory
 .Rapp.history
