@@ -1,11 +1,11 @@
-"Juris","FULLNAME","KC_FCC","RoadMiles","TrafficIntensity","HeavyVehicleCount","MediumVehicleCount","PV_LT_Count","GenScore","RoadwaySkirtImperviousness","RoadwaySkirtOverWater","RoadwayDrainage","PctConveyed","StreamWaterCrossing","RoadwayConnectednessScore","TotalScore","No_SW_Score","ScorePercentile","No_SW_ScorePercentile"
-"WSDOT","I-5 FWY","Freeway",0.4,67845,3791,4781,59271.7226035142,5.03,78,0,"Piped",100,0,-0.1,4.93,3.93,100,99.8
-"WSDOT","I-5 FWY","Freeway",0.7,60719,1940,3972,54807.020216119,4.94,95,0,"Piped",100,0,-0.02,4.92,3.92,100,99.8
-"Seattle","FUHRMAN AVE E","Collector",0.1,88005,2604,5203,80197.5489620407,5.09,63,0,"Piped",100,0,-0.19,4.9,3.9,100,99.8
-"WSDOT","I-5 FWY","Freeway",0.2,45469,2516,3081,39872.0613287922,4.86,100,0,"Piped",100,0,0.01,4.87,3.86,100,99.7
-"WSDOT","I-5 FWY","Freeway",0.4,70005,2001,4697,63306.9343277765,4.99,65,0,"Piped",100,0,-0.17,4.82,3.81,100,99.7
-"WSDOT","NE BOTHELL WAY","Primary",0.1,67059,114,2339,64605.7819454152,4.9,82,0,"None",0,1,-0.08,4.82,4.82,100,100
-"WSDOT","EAST MARGINAL WAY S","Primary",0.1,54821,1250,3673,49897.9762576147,4.87,85,0,"Piped",100,0,-0.06,4.81,3.81,100,99.7
-"WSDOT","I-5 FWY","Freeway",1,74525,3875,5573,65076.7463606372,5.07,52,0,"Piped",100,0,-0.27,4.8,3.79,100,99.7
-"Seattle","ALASKAN WAY S","Minor",0.1,48041,576,2869,44595.8692285568,4.79,100,0,"Piped",100,0,0.01,4.8,3.79,100,99.7
-"WSDOT","I-5 FWY","Freeway",0.1,55427,2213,3281,49933.6543058357,4.91,76,0,"Piped",100,0,-0.11,4.8,3.8,100,99.7
+"Juris","FULLNAME","RoadSegmentID","KC_FCC","RoadMiles","TrafficIntensity","HeavyVehicleCount","MediumVehicleCount","GenScore","RoadwaySkirtImperviousness","RoadwayDrainage","StreamWaterCrossing","PctConveyed","RoadwayConnectednessScore","TotalScore"
+"WSDOT","I-5 FWY","I-5-41960","Freeway",0.4,67845,3791,4781,5.03,78,"Piped",0,100,-0.1,4.93
+"WSDOT","I-5 FWY","I-5-41897","Freeway",0.7,60719,1940,3972,4.94,95,"Piped",0,100,-0.02,4.92
+"Seattle","FUHRMAN AVE E","FUHRMAN-40756","Collector",0.1,88005,2604,5203,5.09,63,"Piped",0,100,-0.19,4.9
+"WSDOT","I-5 FWY","I-5-41925","Freeway",0.2,45469,2516,3081,4.86,100,"Piped",0,100,0.01,4.87
+"WSDOT","I-5 FWY","I-5-41892","Freeway",0.4,70005,2001,4697,4.99,65,"Piped",0,100,-0.17,4.82
+"WSDOT","NE BOTHELL WAY","BOTHELL-57906","Primary",0.1,67059,114,2339,4.9,82,"None",1,0,-0.08,4.82
+"WSDOT","EAST MARGINAL WAY S","EAST MARGINAL-39640","Primary",0.1,54821,1250,3673,4.87,85,"Piped",0,100,-0.06,4.81
+"WSDOT","I-5 FWY","I-5-41872","Freeway",1,74525,3875,5573,5.07,52,"Piped",0,100,-0.27,4.8
+"Seattle","ALASKAN WAY S","ALASKAN-34643","Minor",0.1,48041,576,2869,4.79,100,"Piped",0,100,0.01,4.8
+"WSDOT","I-5 FWY","I-5-41961","Freeway",0.1,55427,2213,3281,4.91,76,"Piped",0,100,-0.11,4.8

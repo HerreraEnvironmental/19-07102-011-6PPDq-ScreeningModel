@@ -80,6 +80,9 @@ kc_roads_SM<-
             ConveyLen_FT=(PipeLen_FT +DitchLen_FT+SwaleLen_FT+StreamLen_FT),
             PctConveyed=ConveyLen_FT/Shape_Leng*100,
             PctConveyed=ifelse(PctConveyed>100,100,PctConveyed),
+    #remove conveyance for non-evalueated stormwater juris
+            PctConveyed=ifelse(Juris %in% c("King County",'Seattle','WSDOT'),PctConveyed,NA), 
+    ConveyType=if_else(Juris %in% c("King County",'Seattle','WSDOT'),ConveyType,NA), 
             BusTraffic =ifelse(is.na(BusTraffic ),0,BusTraffic ),
             Shape_Length=Shape_Leng,
              RoadMiles=Shape_Leng/5280
@@ -117,7 +120,8 @@ kc_roads_SM %>%
   geom_density(alpha=0.5)+
   theme_bw()+
   scale_x_log10(label=scales::number,breaks=c(0.001,.01,0.1,0.5,1,5,10),
-                minor_breaks=NULL)
+                minor_breaks=NULL)+
+  scale_fill_viridis_d()
 
 
 plot_dist_ADT_count<-kc_roads_SM %>%
@@ -128,7 +132,8 @@ plot_dist_ADT_count<-kc_roads_SM %>%
                 limits=c(10,200000),#breaks=c(100,500,1000,5000,10000,50000,100000,200000),
                 minor_breaks=NULL,
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
-  theme_bw()#+
+  theme_bw()+
+  scale_fill_viridis_d()#+
 #  geom_vline(xintercept=c(500,5000,15000))+
  # annotate('label',x=c(100,1000,8000,25000),y=1.5,label=c('Low','Mod.','High','V. High'))
 
@@ -139,7 +144,8 @@ plot_ADT_FCC<-kc_roads_SM %>%
   scale_x_log10('Average Daily Traffic',
                 limits=c(10,200000),#breaks=c(100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
-  theme_bw()#+
+  theme_bw()+
+  scale_fill_viridis_d()#+
  # geom_vline(xintercept=c(500,5000,15000))+
   #annotate('label',x=c(100,1000,8000,25000),y=1.5,label=c('Low','Mod.','High','V. High'))
 ggsave('plots/adt_by_fcc.png',plot_ADT_FCC,scale=0.8,width=10,height=4.5)
@@ -151,7 +157,8 @@ plot_ADT_FCC_no_FW_locals<-kc_roads_SM %>%
   scale_x_log10('Average Daily Traffic',
                 limits=c(10,200000),#breaks=c(100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
-  theme_bw()#+
+  theme_bw()+
+  scale_fill_viridis_d()#+
  # geom_vline(xintercept=c(500,5000,15000))+
   #annotate('label',x=c(100,1000,8000,25000),y=1.5,label=c('Low','Mod.','High','V. High'))
 
@@ -161,7 +168,8 @@ kc_roads_SM %>%
   scale_x_log10('Medium Vehicle Count (per day)',
                 limits=c(1,50000),#breaks=c(10,50,100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
-  theme_bw() #+
+  theme_bw()+
+  scale_fill_viridis_d() #+
 #geom_vline(xintercept = c(5,50,1000))+
 # annotate('label',x=c(1,30,500,5000),y=0.5,label=c('Low','Mod.','High','V. High'))
 
@@ -171,7 +179,8 @@ plot_dist_med_freight_count<-kc_roads_SM %>%
   scale_x_log10('Medium Vehicle Count (per day)',
                 limits=c(1,50000),#breaks=c(10,50,100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
-  theme_bw() #+
+  theme_bw()+
+  scale_fill_viridis_d() #+
 #geom_vline(xintercept = c(5,50,1000))+
 # annotate('label',x=c(1,30,500,5000),y=0.7,label=c('Low','Mod.','High','V. High'))
 ggsave('plots/freight_med_by_fcc.png',plot_dist_med_freight_count,scale=0.8,width=10,height=4.5)
@@ -182,7 +191,8 @@ kc_roads_SM %>%
   scale_x_log10('Heavy Vehicle Count (per day)',
                 limits=c(1,50000),#breaks=c(10,50,100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
-  theme_bw() #+
+  theme_bw()+
+  scale_fill_viridis_d() #+
   #geom_vline(xintercept = c(5,50,1000))+
  # annotate('label',x=c(1,30,500,5000),y=0.5,label=c('Low','Mod.','High','V. High'))
 
@@ -192,7 +202,8 @@ plot_dist_freight_count<-kc_roads_SM %>%
   scale_x_log10('Heavy Vehicle Count (per day)',
                 limits=c(1,50000),#breaks=c(10,50,100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
-  theme_bw() #+
+  theme_bw() +
+  scale_fill_viridis_d()#+
   #geom_vline(xintercept = c(5,50,1000))+
  # annotate('label',x=c(1,30,500,5000),y=0.7,label=c('Low','Mod.','High','V. High'))
 ggsave('plots/freight_by_fcc.png',plot_dist_freight_count,scale=0.8,width=10,height=4.5)
@@ -241,7 +252,8 @@ plot_Imp_FCC<-kc_roads_SM %>%
   ggplot(aes(RdSkirtPctImp,fill=KC_FCC))+
   geom_density(alpha=.5)+
   theme_bw()+
-  xlab('Road Skirt Imperviousness (%)')
+  xlab('Road Skirt Imperviousness (%)')+
+  scale_fill_viridis_d()
 #  geom_vline(xintercept = c(.25,0.5))+
   # ggtitle("Roadway Connectedness")+
   # annotate('label',y=6,x=c(.75,0.375,.125),label=c('High\n(>50% imp & Piped)',
@@ -253,7 +265,8 @@ plot_convey_FCC<-kc_roads_SM %>%
   ggplot(aes(PctConveyed,fill=KC_FCC))+
   geom_density(alpha=.5)+
   theme_bw()+
-  xlab('Conveyance (%)')
+  xlab('Conveyance (%)')+
+  scale_fill_viridis_d()
 ggsave('plots/conveyance_by_FCC.png',plot_convey_FCC,scale=0.8,width=10,height=4.5)
 
 # plot_convey_FCC<-kc_roads_SM %>%
@@ -267,7 +280,8 @@ plot_convey_imp<-kc_roads_SM %>%
   ggplot(aes(RdSkirtPctImp,fill=ConveyType))+
   geom_density(alpha=.5)+
   facet_wrap(~KC_FCC,scales = 'free_y')+
-  theme_bw()
+  theme_bw()+
+  scale_fill_viridis_d()
 ggsave('plots/imperviousness_by_conveyance_FCC.png',plot_convey_imp,scale=0.8,width=10,height=4.5)
 
 plot_convey_type<-kc_roads_SM %>%
@@ -276,7 +290,8 @@ plot_convey_type<-kc_roads_SM %>%
   geom_density(alpha=.5)+
   facet_wrap(~KC_FCC,scales = 'free_y')+
   theme_bw()+
-  scale_x_continuous('Road Skirt Imperviousness (%)')#+
+  scale_x_continuous('Road Skirt Imperviousness (%)')+
+  scale_fill_viridis_d()#+
   # scale_y_log10('count',limits=c(1,NA),
   #               labels=scales::label_number(scale_cut = scales::cut_short_scale()),
   #               minor_breaks=c(1:10,10*1:10,100*1:10,1000*1:10))
@@ -292,7 +307,7 @@ plot_convey_type_impcat<-kc_roads_SM %>%
              scales='free_y')+
   scale_x_discrete('Imperviousness Range')+
   scale_y_continuous('Count (# Segments)')+
-  scale_fill_discrete('Conveyance Type')+
+  scale_fill_viridis_d('Conveyance Type')+
   theme_bw()
 ggsave('plots/conveyance_by_type_FCC_impcat.png',plot_convey_type_impcat,scale=0.8,width=10,height=4.5)
 
@@ -330,8 +345,18 @@ kc_roads_score_alternative<-kc_roads_SM %>%
            No_SW_Score=round(ImpScore+GenScore+ifelse(StreamWaterCrossing,0,-1),2),
            No_SW_Score=ifelse(No_SW_Score<0,0,No_SW_Score)
   ) %>%
-  mutate(ScorePercentile=round(100*rank(TotalScore)/n(),1),
-         No_SW_ScorePercentile=round(100*rank(No_SW_Score)/n(),1))
+  mutate(ScorePercentile=round(100*rank(TotalScore,ties.method='max',na.last='keep')/(length(which(!is.na(TotalScore)))),1),
+         No_SW_ScorePercentile=round(100*rank(No_SW_Score,ties.method = 'max')/n(),1))
+
+kc_roads_score_alternative %>%
+  st_drop_geometry() %>%
+  group_by(KC_FCC) %>%
+  summarise(n=length(which(!is.na(TotalScore))),
+            Score_Mean=mean(TotalScore,na.rm=T),
+            Score_Median=median(TotalScore,na.rm=T),
+            NoSW_n=n(),
+            NoSWScore_Mean=mean(No_SW_Score),
+            NoSWScore_Median=median(No_SW_Score))
 
 example_score_segment_id<-c('16TH-11076','208TH-15051','FALL CITY-CARNATION-40224','PRESTON-FALL CITY-61575',
                             'UNION HILL-58754','I-5-41872','SR 18-81753','RAMP-62710')
@@ -350,7 +375,8 @@ plot_jitter_Scores<-kc_roads_score_alternative %>%
   geom_jitter(height = 0,shape=21,alpha=.5)+
   theme_bw()+
   scale_y_continuous('Screening Model Score',limits=c(0,6))+
-  xlab('Road Classification')
+  xlab('Road Classification')+
+  scale_fill_viridis_d()
 ggsave('plots/plot_jitter_Scores.png',plot_jitter_Scores,scale=0.8,width=10,height=4.5)
 
 plot_jitter_Scores_antiLog<-kc_roads_score_alternative %>%
@@ -361,13 +387,47 @@ plot_jitter_Scores_antiLog<-kc_roads_score_alternative %>%
   theme_bw()+
   scale_y_continuous('Screening Model Score (antilog)',
                      labels=scales::label_log())+
-  xlab('Road Classification')
+  xlab('Road Classification')+
+  scale_fill_viridis_d()
 ggsave('plots/plot_jitter_Scores_antiLog.png',plot_jitter_Scores_antiLog,scale=0.8,width=10,height=4.5)
 
+#all KC (no stormwater data)
+plot_ecdf_noSW_Scores<-kc_roads_score_alternative %>%
+  ggplot(aes(No_SW_Score,col=KC_FCC,group=KC_FCC))+
+  stat_ecdf()+
+  theme_bw()
+ggsave('plots/plot_ecdf_noSW_Scores.png',plot_ecdf_noSW_Scores,scale=0.8,width=10,height=4.5)
+
+plot_jitter_noSW_Scores<-kc_roads_score_alternative %>%
+  ggplot(aes(x=KC_FCC,No_SW_Score,fill=KC_FCC,group=KC_FCC))+
+  geom_boxplot(outlier.colour = NA)+
+  geom_jitter(height = 0,shape=21,alpha=.5)+
+  theme_bw()+
+  scale_y_continuous('Screening Model (No Conveyance) Score',limits=c(0,6))+
+  xlab('Road Classification')+
+  scale_fill_viridis_d()
+ggsave('plots/plot_jitter_noSW_Scores.png',plot_jitter_noSW_Scores,scale=0.8,width=10,height=4.5)
+
+plot_jitter_noSW_Scores_antiLog<-kc_roads_score_alternative %>%
+  #filter(TotalScore>=7) %>%
+  ggplot(aes(x=KC_FCC,10^No_SW_Score,fill=KC_FCC,group=KC_FCC))+
+  geom_boxplot(outlier.colour = NA)+
+  geom_jitter(height = 0,shape=21,alpha=.5)+
+  theme_bw()+
+  scale_y_continuous('Screening Model (No Conveyance) Score (antilog)',
+                     labels=scales::label_log())+
+  xlab('Road Classification')+
+  scale_fill_viridis_d()
+ggsave('plots/plot_jitter_noSW_Scores_antiLog.png',plot_jitter_noSW_Scores_antiLog,scale=0.8,width=10,height=4.5)
+
+
+#top 10s
 top10_scores<-arrange(kc_roads_score_alternative,desc(TotalScore)) %>% st_drop_geometry()%>%slice(1:10) %>%
   mutate(RoadMiles=round(RoadMiles,1),
          across(c(TrafficIntensity:MediumVehicleCount,RoadwaySkirtImperviousness,PctConveyed),round)) %>%
-  select(-ImpScore,-ConveyScore,-RoadSegmentID) 
+  select(Juris,FULLNAME,RoadSegmentID,KC_FCC,RoadMiles,TrafficIntensity,HeavyVehicleCount,
+         MediumVehicleCount,GenScore,RoadwaySkirtImperviousness,RoadwayDrainage,PctConveyed,StreamWaterCrossing,
+         RoadwayConnectednessScore,TotalScore) 
 top10_scores%>%
   write.csv('outputs/top10_roads.csv',row.names = F)
 
@@ -378,7 +438,9 @@ top10_scores_KC<-kc_roads_score_alternative %>%
   slice(1:10) %>%
   mutate(RoadMiles=round(RoadMiles,1),
          across(c(TrafficIntensity:MediumVehicleCount,RoadwaySkirtImperviousness,PctConveyed),round)) %>%
-  select(-ImpScore,-ConveyScore,-RoadSegmentID) 
+  select(Juris,FULLNAME,RoadSegmentID,KC_FCC,RoadMiles,TrafficIntensity,HeavyVehicleCount,
+         MediumVehicleCount,GenScore,RoadwaySkirtImperviousness,RoadwayDrainage,PctConveyed,StreamWaterCrossing,
+         RoadwayConnectednessScore,TotalScore) 
 top10_scores_KC%>%
   write.csv('outputs/top10_roads_kc.csv',row.names = F)
 
