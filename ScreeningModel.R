@@ -371,8 +371,9 @@ ggsave('plots/plot_ecdf_Scores.png',plot_ecdf_Scores,scale=0.8,width=10,height=4
 
 plot_jitter_Scores<-kc_roads_score_alternative %>%
   ggplot(aes(x=KC_FCC,TotalScore,fill=KC_FCC,group=KC_FCC))+
-  geom_boxplot(outlier.colour = NA)+
-  geom_jitter(height = 0,shape=21,alpha=.5)+
+  geom_jitter(aes(color=KC_FCC),height = 0,alpha=.2)+
+  geom_boxplot(outlier.colour = NA,col='black',alpha=1,fill=NA)+
+  scale_color_viridis_d()+
   theme_bw()+
   scale_y_continuous('Screening Model Score',limits=c(0,6))+
   xlab('Road Classification')+
@@ -382,8 +383,9 @@ ggsave('plots/plot_jitter_Scores.png',plot_jitter_Scores,scale=0.8,width=10,heig
 plot_jitter_Scores_antiLog<-kc_roads_score_alternative %>%
   #filter(TotalScore>=7) %>%
   ggplot(aes(x=KC_FCC,10^TotalScore,fill=KC_FCC,group=KC_FCC))+
-  geom_boxplot(outlier.colour = NA)+
-  geom_jitter(height = 0,shape=21,alpha=.5)+
+  geom_jitter(aes(color=KC_FCC),height = 0,alpha=.2)+
+  geom_boxplot(outlier.colour = NA,col='black',alpha=1,fill=NA)+
+  scale_color_viridis_d()+
   theme_bw()+
   scale_y_continuous('Screening Model Score (antilog)',
                      labels=scales::label_log())+
@@ -400,8 +402,9 @@ ggsave('plots/plot_ecdf_noSW_Scores.png',plot_ecdf_noSW_Scores,scale=0.8,width=1
 
 plot_jitter_noSW_Scores<-kc_roads_score_alternative %>%
   ggplot(aes(x=KC_FCC,No_SW_Score,fill=KC_FCC,group=KC_FCC))+
-  geom_boxplot(outlier.colour = NA)+
-  geom_jitter(height = 0,shape=21,alpha=.5)+
+  geom_jitter(aes(color=KC_FCC),height = 0,alpha=.2)+
+  geom_boxplot(outlier.colour = NA,col='black',alpha=1,fill=NA)+
+  scale_color_viridis_d()+
   theme_bw()+
   scale_y_continuous('Screening Model (No Conveyance) Score',limits=c(0,6))+
   xlab('Road Classification')+
@@ -411,8 +414,9 @@ ggsave('plots/plot_jitter_noSW_Scores.png',plot_jitter_noSW_Scores,scale=0.8,wid
 plot_jitter_noSW_Scores_antiLog<-kc_roads_score_alternative %>%
   #filter(TotalScore>=7) %>%
   ggplot(aes(x=KC_FCC,10^No_SW_Score,fill=KC_FCC,group=KC_FCC))+
-  geom_boxplot(outlier.colour = NA)+
-  geom_jitter(height = 0,shape=21,alpha=.5)+
+  geom_jitter(aes(color=KC_FCC),height = 0,alpha=.2)+
+  geom_boxplot(outlier.colour = NA,col='black',alpha=1,fill=NA)+
+  scale_color_viridis_d()+
   theme_bw()+
   scale_y_continuous('Screening Model (No Conveyance) Score (antilog)',
                      labels=scales::label_log())+
