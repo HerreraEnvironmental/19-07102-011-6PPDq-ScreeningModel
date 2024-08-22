@@ -311,6 +311,44 @@ plot_convey_type_impcat<-kc_roads_SM %>%
   theme_bw()
 ggsave('plots/conveyance_by_type_FCC_impcat.png',plot_convey_type_impcat,scale=0.8,width=10,height=4.5)
 
+# predict conveyance based on imperviousness and conveyance
+kc_roads_SM %>%
+  filter(!is.na(ConveyType)) %>%
+  ggplot(aes(x=RdSkirtPctImp,y=PctConveyed))+
+  geom_point(aes(col=ConveyType))+
+  facet_wrap(~KC_FCC)+
+  geom_smooth(span=.9)+
+  theme_bw()
+
+library(tidyr);library(purrr)
+model_conveyPct<-kc_roads_SM %>%
+  filter(!is.na(ConveyType)) %>%
+  group_by(KC_FCC) %>%
+  nest() %>%
+  mutate(loessModel=map(.x=data,.f=~loess(PctConveyed~RdSkirtPctImp,data=.x,span=.9)))
+
+kc_roads_SM_predConvey<-kc_roads_SM %>%
+  group_by(KC_FCC) %>%
+  nest() %>%
+  left_join(model_conveyPct %>% select(KC_FCC,loessModel)) %>%
+  mutate(ConveyPct_Predicted=map2(.x=data,.y=loessModel,.f=~{
+    predict(.y,data.frame(RdSkirtPctImp=.x$RdSkirtPctImp))
+  })) %>%
+  select(-loessModel) %>%
+  unnest(cols = c(data, ConveyPct_Predicted)) %>%
+  select(KC_FCC,RoadSegmentID,ConveyPct_Predicted) %>%
+  ungroup()
+
+kc_roads_SM %>%
+  left_join(kc_roads_SM_predConvey) %>%
+  ggplot(aes(x=RdSkirtPctImp,y=PctConveyed))+
+  geom_point(col='grey')+
+  facet_wrap(~KC_FCC)+
+  geom_smooth()+
+  geom_line(aes(y=ConveyPct_Predicted),col='red')+
+  theme_bw()
+
+
 library(leaflet)
 
 #add in multipliers for emission factor rates
@@ -319,6 +357,7 @@ multiplier_mediumVehicle<-2.42
 multiplier_heavyVehicle<-7.83
 
 kc_roads_score_alternative<-kc_roads_SM %>%
+  left_join(kc_roads_SM_predConvey) %>%
   transmute(RoadSegmentID,
             Juris,
             FULLNAME,RoadSegmentID,KC_FCC,
@@ -336,13 +375,16 @@ kc_roads_score_alternative<-kc_roads_SM %>%
             RoadwaySkirtOverWater=RdSkirtPctOverwater,
             RoadwayDrainage=ConveyType,
             PctConveyed,
+            PctConveyed_PREDICTED=ifelse(is.na(PctConveyed),ConveyPct_Predicted,PctConveyed),
             StreamWaterCrossing,
             ImpScore=log10((RoadwaySkirtImperviousness+1)/100), #note that imperviousness is inclusive of water surface
             ConveyScore=ifelse(StreamWaterCrossing==1,0,log10((PctConveyed+1)/100)),
+            ConveyScore_PRED=ifelse(StreamWaterCrossing==1,0,log10((PctConveyed_PREDICTED+1)/100)),
             RoadwayConnectednessScore=round(ImpScore+ConveyScore,2),
             TotalScore=(GenScore+RoadwayConnectednessScore),
            TotalScore=ifelse(TotalScore<0,0,TotalScore),
-           No_SW_Score=round(ImpScore+GenScore+ifelse(StreamWaterCrossing,0,-1),2),
+           No_SW_RoadwayConnectednessScore=round(ImpScore+ConveyScore_PRED,2),
+           No_SW_Score=GenScore+No_SW_RoadwayConnectednessScore,
            No_SW_Score=ifelse(No_SW_Score<0,0,No_SW_Score)
   ) %>%
   mutate(ScorePercentile=round(100*rank(TotalScore,ties.method='max',na.last='keep')/(length(which(!is.na(TotalScore)))),1),
@@ -477,22 +519,22 @@ kc_roads_score_alternative %>%
 
 #top 10000 map:
 kc_roads_score_alternative %>% 
-  arrange(desc(TotalScore)) %>%
-  slice(1:10000)%>%
+  arrange(desc(No_SW_Score)) %>%
+  slice(1:20000)%>%
   filter(!st_is_empty(.)) %>%
   leaflet() %>%
   addProviderTiles('Esri.WorldImagery') %>%
-  addPolylines(color=~pal_alt(TotalScore),popup = ~paste(FULLNAME,RoadSegmentID,KC_FCC,
+  addPolylines(color=~pal_alt(No_SW_Score),popup = ~paste(FULLNAME,RoadSegmentID,KC_FCC,
                                                          paste('Juris from LOG:',Juris),
                                                         # paste('Juris from Spatial Join:',JurisFinal),
-                                                         paste('Total Score:',TotalScore),
+                                                         paste('Total Score:',No_SW_Score),
                                                          paste('ADT:',round(TrafficIntensity)),
                                                          paste('Hvy Veh:',round(HeavyVehicleCount)),
                                                          paste('Med Veh:',round(MediumVehicleCount)),
                                                          paste('%Imp:',round(RoadwaySkirtImperviousness,0)),
                                                          paste('%Wtr:',round(RoadwaySkirtOverWater,0)),
                                                          paste('Drainage:',RoadwayDrainage),
-                                                         paste('%Conveyed:',round(PctConveyed,0)),
+                                                         paste('%Conveyed:',round(PctConveyed_PREDICTED,0)),
                                                          paste('OverWater:',ifelse(StreamWaterCrossing==1,'Yes','No')),
                                                          # paste('Connectedness:',RoadwayConnectednessScore),
                                                          sep='<br>'),
