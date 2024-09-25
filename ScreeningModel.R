@@ -128,7 +128,7 @@ kc_roads_SM %>%
   geom_density(alpha=0.5)+
   theme_bw()+
   scale_x_log10(label=scales::number,breaks=c(0.001,.01,0.1,0.5,1,5,10),
-                minor_breaks=NULL)+
+                minor_breaks=c(.1*1:10,1:10,10*1:10,100*1:10,1000*1:10,10^4*1:10,10^5*1:10))+
   scale_fill_viridis_d()
 
 
@@ -138,7 +138,7 @@ plot_dist_ADT_count<-kc_roads_SM %>%
   geom_density(alpha=.5)+
   scale_x_log10('Average Daily Traffic',
                 limits=c(10,200000),#breaks=c(100,500,1000,5000,10000,50000,100000,200000),
-                minor_breaks=NULL,
+                minor_breaks=c(.1*1:10,1:10,10*1:10,100*1:10,1000*1:10,10^4*1:10,10^5*1:10),
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
   theme_bw()+
   scale_fill_viridis_d()#+
@@ -151,6 +151,7 @@ plot_ADT_FCC<-kc_roads_SM %>%
   geom_density(alpha=.5)+
   scale_x_log10('Average Daily Traffic',
                 limits=c(10,200000),#breaks=c(100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
+                minor_breaks=c(.1*1:10,1:10,10*1:10,100*1:10,1000*1:10,10^4*1:10,10^5*1:10),
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
   theme_bw()+
   scale_fill_viridis_d()#+
@@ -164,6 +165,7 @@ plot_ADT_FCC_no_FW_locals<-kc_roads_SM %>%
   geom_density(alpha=.5)+
   scale_x_log10('Average Daily Traffic',
                 limits=c(10,200000),#breaks=c(100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
+                minor_breaks=c(.1*1:10,1:10,10*1:10,100*1:10,1000*1:10,10^4*1:10,10^5*1:10),
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
   theme_bw()+
   scale_fill_viridis_d()#+
@@ -175,6 +177,7 @@ kc_roads_SM %>%
   geom_density(alpha=.5)+
   scale_x_log10('Medium Vehicle Count (per day)',
                 limits=c(1,50000),#breaks=c(10,50,100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
+                minor_breaks=c(.1*1:10,1:10,10*1:10,100*1:10,1000*1:10,10^4*1:10,10^5*1:10),
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
   theme_bw()+
   scale_fill_viridis_d() #+
@@ -186,6 +189,7 @@ plot_dist_med_freight_count<-kc_roads_SM %>%
   geom_density(alpha=.5)+
   scale_x_log10('Medium Vehicle Count (per day)',
                 limits=c(1,50000),#breaks=c(10,50,100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
+                minor_breaks=c(.1*1:10,1:10,10*1:10,100*1:10,1000*1:10,10^4*1:10,10^5*1:10),
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
   theme_bw()+
   scale_fill_viridis_d() #+
@@ -198,6 +202,7 @@ kc_roads_SM %>%
   geom_density(alpha=.5)+
   scale_x_log10('Heavy Vehicle Count (per day)',
                 limits=c(1,50000),#breaks=c(10,50,100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
+                minor_breaks=c(.1*1:10,1:10,10*1:10,100*1:10,1000*1:10,10^4*1:10,10^5*1:10),
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
   theme_bw()+
   scale_fill_viridis_d() #+
@@ -209,6 +214,7 @@ plot_dist_freight_count<-kc_roads_SM %>%
   geom_density(alpha=.5)+
   scale_x_log10('Heavy Vehicle Count (per day)',
                 limits=c(1,50000),#breaks=c(10,50,100,500,1000,5000,10000,50000,100000,200000),minor_breaks=NULL,
+                minor_breaks=c(.1*1:10,1:10,10*1:10,100*1:10,1000*1:10,10^4*1:10,10^5*1:10),
                 labels=scales::label_number(scale_cut = scales::cut_short_scale()))+
   theme_bw() +
   scale_fill_viridis_d()#+
@@ -346,15 +352,15 @@ model_conveyPct<-kc_roads_SM %>%
 
 kc_roads_SM_predConvey<-kc_roads_SM %>%
   st_drop_geometry() %>%
-  group_by(KC_FCC,Juris) %>%
+  group_by(KC_FCC,SW_Juris) %>%
   nest() %>%
   # left_join(model_conveyPct %>% select(KC_FCC,loessModel)) %>%
   mutate(ConveyPct_Predicted=map(.x=data,.f=~{
-    if(is.na(Juris)){
+    if(is.na(SW_Juris)){
       predict(model_conveyPct$loessModel[model_conveyPct$KC_FCC==KC_FCC][[1]],
               data.frame(RdSkirtPctImp=.x$RdSkirtPctImp))
     }
-    else if (Juris=='WSDOT'&KC_FCC %in% c('Primary','Freeway')){
+    else if (!(SW_Juris %in% c('King County','Seattle'))&KC_FCC %in% c('Primary','Freeway')){
       predict(model_conveyPct$loessModel[model_conveyPct$KC_FCC=='Primary'][[1]],
               data.frame(RdSkirtPctImp=.x$RdSkirtPctImp))
     }else{
@@ -366,7 +372,20 @@ kc_roads_SM_predConvey<-kc_roads_SM %>%
         unnest(cols = c(data, ConveyPct_Predicted)) %>%
         ungroup() %>%
         select(KC_FCC,RoadSegmentID,ConveyPct_Predicted)
-      
+
+conveyance_by_impervious_FCC_imputed<-kc_roads_SM %>%
+  st_drop_geometry() %>%
+  left_join(kc_roads_SM_predConvey) %>%
+  mutate(PctConveyed_USE=ifelse(SW_DATA_Available,PctConveyed,ConveyPct_Predicted)) %>%
+  #  filter(Juris %in% c('Seattle','King County')|(Juris=='WSDOT'&PctConveyed>0)) %>%
+  ggplot(aes(x=RdSkirtPctImp,y=PctConveyed_USE))+
+  geom_point(aes(col=SW_DATA_Available))+
+  facet_wrap(~KC_FCC)+
+  #geom_smooth(span=.9)+
+  theme_bw()
+ggsave('plots/conveyance_by_impervious_FCC_imputed.png',conveyance_by_impervious_FCC_imputed,
+       scale=0.8,width=10,height=4.5)
+
       
 kc_roads_SM %>%
   st_drop_geometry() %>%
