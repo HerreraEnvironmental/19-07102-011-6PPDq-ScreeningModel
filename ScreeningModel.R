@@ -34,23 +34,30 @@ library(cowplot)
 
 hec_gdb<-'\\\\herrera.local\\hecnet\\gis-k\\Projects\\Y2019\\19-07102-011\\Geodatabase\\GIS_Working\\WQBE6ppdq_20240717.gdb'
 
-st_layers(hec_gdb)
+#st_layers(hec_gdb)
 
 hec_gis_export<-
 #read_excel('inputs/KC_Street_Address_SummaryAttributes_20240223_v2.xlsx') %>%
 #read_excel('O:\\proj\\Y2019\\19-07102-011\\GIS\\KC_Street_Address_SummaryAttributes_20240718_v2.xlsx')
  st_read(hec_gdb,
          layer = 'King_County_St_Addresses_6PPDQ_Metrics_20240718')
+
+#read in juridstiction by areas (if a WSDOT road runs through the city, what city is it?)
+geo_sw_juris<-read_excel('O:\\proj\\Y2019\\19-07102-011\\GIS\\KC_Street_Address_Juris_SWJuris_20240924.xlsx') %>%
+  distinct()
    
 kc_roads_SM<-
   hec_gis_export %>%  
   st_transform(4326) %>%
+  left_join(geo_sw_juris) %>%
  # left_join(ditch_estimates) %>%
  # mutate(DitchLen_FT=as.numeric(DitchLength)) %>%
   transmute(FRADDL,FRADDR,TOADDL,TOADDR,FULLNAME,
             RoadSegmentID,
             KC_FCC=factor(KC_FCC,levels=c('L','C','M','P','F'),
                        labels=c('Local','Collector','Minor','Primary','Freeway')),
+           # Juris,
+            SW_Juris,
             Juris=Jurisdiction,
             TAZ,
             emme_linkID,
@@ -78,11 +85,12 @@ kc_roads_SM<-
                                   StreamLen_FT>0~'Stream',
                                   T~'None') %>% factor(levels=c('None','Ditched','Swale','Stream','Piped')),
             ConveyLen_FT=(PipeLen_FT +DitchLen_FT+SwaleLen_FT+StreamLen_FT),
+    SW_DATA_Available=(Juris=='WSDOT'&ConveyLen_FT>0)|SW_Juris %in% c('King County','Seattle'),
             PctConveyed=ConveyLen_FT/Shape_Leng*100,
             PctConveyed=ifelse(PctConveyed>100,100,PctConveyed),
-    #remove conveyance for non-evalueated stormwater juris
-            PctConveyed=ifelse(Juris %in% c("King County",'Seattle','WSDOT'),PctConveyed,NA), 
-    ConveyType=if_else(Juris %in% c("King County",'Seattle','WSDOT'),ConveyType,NA), 
+    #remove conveyance for WSDOT within other jurisdictions
+    PctConveyed=ifelse(SW_DATA_Available,PctConveyed,NA),
+    ConveyType=if_else(!is.na(PctConveyed),ConveyType,NA), 
             BusTraffic =ifelse(is.na(BusTraffic ),0,BusTraffic ),
             Shape_Length=Shape_Leng,
              RoadMiles=Shape_Leng/5280
@@ -312,40 +320,63 @@ plot_convey_type_impcat<-kc_roads_SM %>%
 ggsave('plots/conveyance_by_type_FCC_impcat.png',plot_convey_type_impcat,scale=0.8,width=10,height=4.5)
 
 # predict conveyance based on imperviousness and conveyance
-kc_roads_SM %>%
-  filter(!is.na(ConveyType)) %>%
+conveyance_by_impervious_FCC<-kc_roads_SM %>%
+  filter(SW_DATA_Available) %>%
+#  filter(Juris %in% c('Seattle','King County')|(Juris=='WSDOT'&PctConveyed>0)) %>%
   ggplot(aes(x=RdSkirtPctImp,y=PctConveyed))+
   geom_point(aes(col=ConveyType))+
   facet_wrap(~KC_FCC)+
   geom_smooth(span=.9)+
   theme_bw()
+ggsave('plots/conveyance_by_impervious_FCC.png',conveyance_by_impervious_FCC,scale=0.8,width=10,height=4.5)
+
+
+
+#Need to impute conveyance for juridstictions outisde of SEattle and King County
+#This includes WSDOT roads within other city's juridstictions
 
 library(tidyr);library(purrr)
 model_conveyPct<-kc_roads_SM %>%
-  filter(!is.na(ConveyType)) %>%
+  filter(SW_DATA_Available) %>%
   group_by(KC_FCC) %>%
   nest() %>%
   mutate(loessModel=map(.x=data,.f=~loess(PctConveyed~RdSkirtPctImp,data=.x,span=.9)))
 
-kc_roads_SM_predConvey<-kc_roads_SM %>%
-  group_by(KC_FCC) %>%
-  nest() %>%
-  left_join(model_conveyPct %>% select(KC_FCC,loessModel)) %>%
-  mutate(ConveyPct_Predicted=map2(.x=data,.y=loessModel,.f=~{
-    predict(.y,data.frame(RdSkirtPctImp=.x$RdSkirtPctImp))
-  })) %>%
-  select(-loessModel) %>%
-  unnest(cols = c(data, ConveyPct_Predicted)) %>%
-  select(KC_FCC,RoadSegmentID,ConveyPct_Predicted) %>%
-  ungroup()
+#use Primary Arterial for Freeways inside of Jurisdictions
 
+kc_roads_SM_predConvey<-kc_roads_SM %>%
+  st_drop_geometry() %>%
+  group_by(KC_FCC,Juris) %>%
+  nest() %>%
+  # left_join(model_conveyPct %>% select(KC_FCC,loessModel)) %>%
+  mutate(ConveyPct_Predicted=map(.x=data,.f=~{
+    if(is.na(Juris)){
+      predict(model_conveyPct$loessModel[model_conveyPct$KC_FCC==KC_FCC][[1]],
+              data.frame(RdSkirtPctImp=.x$RdSkirtPctImp))
+    }
+    else if (Juris=='WSDOT'&KC_FCC %in% c('Primary','Freeway')){
+      predict(model_conveyPct$loessModel[model_conveyPct$KC_FCC=='Primary'][[1]],
+              data.frame(RdSkirtPctImp=.x$RdSkirtPctImp))
+    }else{
+      predict(model_conveyPct$loessModel[model_conveyPct$KC_FCC==KC_FCC][[1]],
+              data.frame(RdSkirtPctImp=.x$RdSkirtPctImp))
+    }
+  })) %>%
+        # select(-loessModel) %>%
+        unnest(cols = c(data, ConveyPct_Predicted)) %>%
+        ungroup() %>%
+        select(KC_FCC,RoadSegmentID,ConveyPct_Predicted)
+      
+      
 kc_roads_SM %>%
+  st_drop_geometry() %>%
   left_join(kc_roads_SM_predConvey) %>%
-  ggplot(aes(x=RdSkirtPctImp,y=PctConveyed))+
+  mutate(PctConveyed_PREDICTED=ifelse(is.na(PctConveyed),ConveyPct_Predicted,PctConveyed)) %>%
+  ggplot(aes(x=RdSkirtPctImp,y=PctConveyed_PREDICTED))+
   geom_point(col='grey')+
   facet_wrap(~KC_FCC)+
-  geom_smooth()+
-  geom_line(aes(y=ConveyPct_Predicted),col='red')+
+  #geom_smooth()+
+  #geom_line(aes(y=PctConveyed_PREDICTED),col='red')+
   theme_bw()
 
 
@@ -375,7 +406,7 @@ kc_roads_score_alternative<-kc_roads_SM %>%
             RoadwaySkirtOverWater=RdSkirtPctOverwater,
             RoadwayDrainage=ConveyType,
             PctConveyed,
-            PctConveyed_PREDICTED=ifelse(is.na(PctConveyed),ConveyPct_Predicted,PctConveyed),
+            PctConveyed_PREDICTED=ifelse(SW_DATA_Available,ConveyPct_Predicted,PctConveyed),
             StreamWaterCrossing,
             ImpScore=log10((RoadwaySkirtImperviousness+1)/100), #note that imperviousness is inclusive of water surface
             ConveyScore=ifelse(StreamWaterCrossing==1,0,log10((PctConveyed+1)/100)),
