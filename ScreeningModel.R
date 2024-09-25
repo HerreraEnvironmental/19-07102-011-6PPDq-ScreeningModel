@@ -405,8 +405,9 @@ kc_roads_score_alternative<-kc_roads_SM %>%
             RoadwaySkirtImperviousness=RdSkirtPctImp,
             RoadwaySkirtOverWater=RdSkirtPctOverwater,
             RoadwayDrainage=ConveyType,
+            SW_DATA_Available,
             PctConveyed,
-            PctConveyed_PREDICTED=ifelse(SW_DATA_Available,ConveyPct_Predicted,PctConveyed),
+            PctConveyed_PREDICTED=ifelse(SW_DATA_Available,PctConveyed,ConveyPct_Predicted),
             StreamWaterCrossing,
             ImpScore=log10((RoadwaySkirtImperviousness+1)/100), #note that imperviousness is inclusive of water surface
             ConveyScore=ifelse(StreamWaterCrossing==1,0,log10((PctConveyed+1)/100)),
@@ -527,7 +528,7 @@ kc_roads_score_alternative %>%
 
 pal_alt<-colorNumeric('RdYlBu',0:6,reverse=T)
 kc_roads_score_alternative %>% 
-  filter(!st_is_empty(.)) %>%
+  filter(!st_is_empty(.)&SW_DATA_Available) %>%
   leaflet() %>%
   addProviderTiles('Esri.WorldImagery') %>%
   addPolylines(color=~pal_alt(TotalScore),popup = ~paste(FULLNAME,RoadSegmentID,KC_FCC,
