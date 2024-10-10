@@ -160,7 +160,7 @@ density_plot_arguments_by_fcc<-function(data,x_var,x_name,LOG=F){
   ggplot(data,aes(!!x_var,fill=KC_FCC))+
     geom_density(alpha=.5)+
     theme_bw()+
-    scale_fill_viridis_d()+
+    scale_fill_viridis_d('Road Class')+
     scale_y_continuous('Density')+
     {
       if(!LOG){
@@ -181,7 +181,8 @@ violin_plot_arguments_by_fcc<-function(data,y_var,y_name,LOG=F){
     geom_violin(draw_quantiles = c(0.25, 0.75),linetype='dashed',col='black')+
     geom_violin(draw_quantiles = c(0.5),col='black',fill='transparent')+
     theme_bw()+
-    scale_fill_viridis_d()+
+    xlab('Road Classification')+
+    scale_fill_viridis_d('Road Class')+
     {
       if(!LOG){
         scale_y_continuous(y_name)
