@@ -181,6 +181,7 @@ violin_plot_arguments_by_fcc<-function(data,y_var,y_name,LOG=F){
     geom_violin(draw_quantiles = c(0.25, 0.75),linetype='dashed',col='black')+
     geom_violin(draw_quantiles = c(0.5),col='black',fill='transparent')+
     theme_bw()+
+    theme(legend.position = 'none')+
     xlab('Road Classification')+
     scale_fill_viridis_d('Road Class')+
     {
@@ -262,13 +263,16 @@ ggsave('plots/imperviousness_by_conveyance_FCC.png',plot_convey_imp,scale=0.8,wi
 
 plot_convey_imp_violin<-kc_roads_SM %>%
   filter(SW_DATA_Available) %>%
+  mutate(ConveyType=if_else(ConveyType=='Swale','Ditched',ConveyType) %>%
+           factor(levels=c('None','Ditched','Piped'))) %>%
   ggplot(aes(ConveyType,y=RdSkirtPctImp))+
   geom_jitter(alpha=0.4,height = 0,aes(fill=ConveyType),shape=21)+
   geom_violin(draw_quantiles = c(0.25, 0.75),linetype='dashed',col='black')+
   geom_violin(draw_quantiles = c(0.5),col='black',fill='transparent')+
   facet_wrap(~KC_FCC,scales = 'free_y')+
   theme_bw()+
-  scale_fill_viridis_d()+
+  scale_fill_viridis_d('Type')+
+  theme(legend.position = 'none')+
   xlab('Conveyance Type')+
   ylab('Skirt Imperviousness (%)')
 ggsave('plots/imperviousness_by_conveyance_violin.png',plot_convey_imp_violin,scale=0.8,width=10,height=4.5)
@@ -290,12 +294,18 @@ ggsave('plots/conveyance_by_type_FCC_impcat.png',plot_convey_type_impcat,scale=0
 # predict conveyance based on imperviousness and conveyance
 conveyance_by_impervious_FCC<-kc_roads_SM %>%
   filter(SW_DATA_Available) %>%
+  mutate(ConveyType=if_else(ConveyType=='Swale','Ditched',ConveyType) %>%
+           factor(levels=c('None','Ditched','Piped'))) %>%
 #  filter(Juris %in% c('Seattle','King County')|(Juris=='WSDOT'&PctConveyed>0)) %>%
   ggplot(aes(x=RdSkirtPctImp,y=PctConveyed))+
   geom_point(aes(col=ConveyType))+
   facet_wrap(~KC_FCC)+
   geom_smooth(span=.9)+
-  theme_bw()
+  theme_bw()+
+  scale_colour_viridis_d('Type')+
+  theme(legend.position = 'bottom')+
+  scale_x_continuous('Road Skirt Imperviousness (%)')+
+  scale_y_continuous('Conveyance (%)')
 ggsave('plots/conveyance_by_impervious_FCC.png',conveyance_by_impervious_FCC,scale=0.8,width=10,height=4.5)
 
 conveyance_aggr_by_impervious_FCC<-kc_roads_SM %>%
@@ -305,7 +315,9 @@ conveyance_aggr_by_impervious_FCC<-kc_roads_SM %>%
   geom_point()+
   facet_wrap(~KC_FCC)+
   geom_smooth(span=.9)+
-  theme_bw()
+  theme_bw()+
+  scale_x_continuous('Road Skirt Imperviousness (%)')+
+  scale_y_continuous('Conveyance (%)')
 ggsave('plots/conveyance_aggr_by_impervious_FCC.png',conveyance_aggr_by_impervious_FCC,scale=0.8,width=10,height=4.5)
 
 conveyance_aggr_by_impervious_FCC_KCSeattleVsOther<-kc_roads_SM %>%
@@ -411,7 +423,7 @@ plot_jitter_Scores_antiLog<-kc_roads_score_alternative %>%
                      limits=c(0,10^5))
 ggsave('plots/plot_jitter_Scores_antiLog.png',plot_jitter_Scores_antiLog,scale=0.8,width=10,height=4.5)
 
-#all KC (no stormwater data)
+#noSW includes the areas without coverage (e.g., Yarrow Point), with imputed conveyance values
 plot_ecdf_noSW_Scores<-kc_roads_score_alternative %>%
   ggplot(aes(Imputed_SW_Score,col=KC_FCC,group=KC_FCC))+
   stat_ecdf()+
