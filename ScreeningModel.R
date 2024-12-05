@@ -90,9 +90,11 @@ kc_roads_score<-kc_roads_SM %>%
             PctConveyed=Aggr_PctConveyed,
             PctConveyed_PREDICTED=ifelse(is.na(ConveyPct_Predicted),PctConveyed,ConveyPct_Predicted),
             StreamWaterCrossing,
-            ImpScore=log10((RoadwaySkirtImperviousness+1)/100), #note that imperviousness is inclusive of water surface
+            ImpScore=log10(ifelse(RoadwaySkirtImperviousness<=0,0.01,
+                                  RoadwaySkirtImperviousness/100)), #note that imperviousness is inclusive of water surface
             #Conveyance Score
-            ConveyScore=ifelse(StreamWaterCrossing==1,0,log10((PctConveyed+1)/100)),
+            ConveyScore=ifelse(StreamWaterCrossing==1,0,
+                               log10(ifelse(PctConveyed<=0,0.01,PctConveyed/100))),
             ConveyScore_PRED=ifelse(StreamWaterCrossing==1,0,log10((PctConveyed_PREDICTED+1)/100)), #using imputed data
             #Connectedness Score
             RoadwayConnectednessScore=round(ImpScore+ConveyScore,2),
@@ -110,3 +112,4 @@ kc_roads_score<-kc_roads_SM %>%
 file.remove('outputs/GIS/kc_roads_scored.geojson')
 kc_roads_score %>%
   st_write('outputs/GIS/kc_roads_scored.geojson',append = F)
+

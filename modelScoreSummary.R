@@ -44,13 +44,13 @@ ggsave('plots/plot_ecdf_noSW_Scores.png',plot_ecdf_noSW_Scores,scale=0.8,width=1
 
 plot_jitter_noSW_Scores<-kc_roads_score %>%
   violin_plot_arguments_by_fcc(Imputed_SW_Score,'')+
-  scale_y_continuous('Screening Model (Imputed Conveyance) Score',limits=c(0,5))
+  scale_y_continuous('Screening Model Score\n(Imputed Conveyance)',limits=c(0,5))
 ggsave('plots/plot_jitter_noSW_Scores.png',plot_jitter_noSW_Scores,scale=0.8,width=10,height=4.5)
 
 plot_jitter_noSW_Scores_antiLog<-kc_roads_score %>%
   mutate(ImputedSW_Score_AntiLog=10^Imputed_SW_Score) %>%
   violin_plot_arguments_by_fcc(ImputedSW_Score_AntiLog,'')+
-  scale_y_continuous('Screening Model (Imputed Conveyance) Score (antilog)',
+  scale_y_continuous('Screening Model Score (antilog)\n(Imputed Conveyance)',
                      labels=scales::label_log(),
                      limits=c(0,10^5))
 ggsave('plots/plot_jitter_noSW_Scores_antiLog.png',plot_jitter_noSW_Scores_antiLog,scale=0.8,width=10,height=4.5)
@@ -78,3 +78,4 @@ top10_scores_KC<-kc_roads_score %>%
          RoadwayConnectednessScore,TotalScore) 
 top10_scores_KC%>%
   write.csv('outputs/top10_roads_kc.csv',row.names = F)
+
