@@ -29,6 +29,7 @@ kc_roads_score %>%
 #top 10000 map:
 kc_roads_score %>% 
   arrange(desc(Imputed_SW_Score)) %>%
+  filter(KC_FCC=='Freeway') %>%
   slice(1:20000)%>%
   filter(!st_is_empty(.)) %>%
   leaflet() %>%

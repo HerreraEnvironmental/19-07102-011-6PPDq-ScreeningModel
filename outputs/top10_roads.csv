@@ -1,11 +1,11 @@
 "Juris","FULLNAME","RoadSegmentID","KC_FCC","RoadMiles","TrafficIntensity","HeavyVehicleCount","MediumVehicleCount","GenScore","RoadwaySkirtImperviousness","RoadwayDrainage","PctConveyed","StreamWaterCrossing","RoadwayConnectednessScore","TotalScore"
-"WSDOT","I-5 FWY","I-5-41897","Freeway",0.7,60719,1940,3972,4.94,95,"Piped",100,0,-0.02,4.92
-"WSDOT","I-5 FWY","I-5-41960","Freeway",0.4,67845,3791,4781,5.03,78,"Piped",100,0,-0.11,4.92
-"Seattle","FUHRMAN AVE E","FUHRMAN-40756","Collector",0.1,88005,2604,5203,5.09,63,"Piped",100,0,-0.2,4.89
-"WSDOT","I-5 FWY","I-5-41925","Freeway",0.2,45469,2516,3081,4.86,100,"Piped",100,0,0,4.86
-"WSDOT","NE BOTHELL WAY","BOTHELL-57906","Primary",0.1,67059,114,2339,4.9,82,NA,100,1,-0.09,4.81
-"WSDOT","EAST MARGINAL WAY S","EAST MARGINAL-39640","Primary",0.1,54821,1250,3673,4.87,85,"Piped",100,0,-0.07,4.8
-"WSDOT","I-5 FWY","I-5-41892","Freeway",0.4,70005,2001,4697,4.99,65,"Piped",100,0,-0.19,4.8
-"Seattle","ALASKAN WAY S","ALASKAN-34643","Minor",0.1,48041,576,2869,4.79,100,"Piped",100,0,0,4.79
-"WSDOT","I-5 FWY","I-5-41961","Freeway",0.1,55427,2213,3281,4.91,76,"Piped",100,0,-0.12,4.79
-"WSDOT","EAST MARGINAL WAY S","EAST MARGINAL-39641","Primary",0.1,50164,1181,3390,4.84,88,"Piped",100,0,-0.06,4.78
+"WSDOT","I-5 FWY","I-5-41892","Freeway",0.4,113681,3265,7722,5.2,65,"Piped",100,0,-0.19,5
+"WSDOT","I-5 FWY","I-5-41897","Freeway",0.7,100859,3818,6274,5.17,95,"Piped",100,0,-0.02,5
+"WSDOT","I-5 FWY","I-5-41916","Freeway",0.1,112034,4385,8043,5.22,77,"Piped",100,0,-0.12,5
+"WSDOT","I-5 FWY","I-5-41925","Freeway",0.2,86725,4954,5982,5.14,100,"Piped",100,0,0,5
+"WSDOT","I-5 FWY","I-5-41960","Freeway",0.4,92253,4970,7060,5.16,78,"Piped",100,0,-0.11,5
+"WSDOT","I-5 FWY","I-5-41998","Freeway",0.1,89823,9499,6121,5.24,100,"Piped",100,0,0,5
+"WSDOT","LAKE CITY WAY NE","LAKE CITY-42971","Primary",0,107456,205,4008,5.1,82,"Piped",100,0,-0.09,5
+"WSDOT","I-90 FWY","I-90-42053","Freeway",0.3,86091,1356,5292,5.05,87,NA,14,1,-0.06,4.99
+"WSDOT","I-90 FWY","I-90-42021","Freeway",2.2,81212,1387,5479,5.03,90,"Piped",5,1,-0.05,4.98
+"WSDOT","I-5 FWY","I-5-41964","Freeway",0.1,107212,5039,6555,5.21,58,"Piped",100,0,-0.23,4.98

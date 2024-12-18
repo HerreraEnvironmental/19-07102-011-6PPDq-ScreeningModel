@@ -3,11 +3,11 @@ library(readxl)
 library(sf)
 
 #select geodatabase holding output from Geospatial Harmonization
-hec_gdb<-'\\\\herrera.local\\hecnet\\gis-k\\Projects\\Y2019\\19-07102-011\\Geodatabase\\GIS_Working\\WQBE6ppdq_20241007.gdb'
+hec_gdb_TA<-'\\\\herrera.local\\hecnet\\gis-k\\Projects\\Y2019\\19-07102-011\\Geodatabase\\GIS_Working\\TrafficAllocations_20241208.gdb'
 
 #Load in the harmonized spatial layer
-hec_gis_export<-st_read(hec_gdb,
-          layer = 'King_County_St_Addresses_6PPDQ_Metrics_20241008_v2')
+hec_TA_export<-st_read(hec_gdb_TA,
+                       layer='King_County_St_Addresses_6PPDQ_Metrics_20241218')
 
 #read in jurisdiction by areas (i.e., if a WSDOT road runs through the city, what city is it in?)
 geo_sw_juris<-read_excel('O:\\proj\\Y2019\\19-07102-011\\GIS\\KC_Street_Address_Juris_SWJuris_20240924.xlsx') %>%
@@ -18,7 +18,8 @@ missing_sw_juris<-c('Carnation','Medina','Yarrow Point','Skykomish')
 
 
 kc_roads_SM<-
-  hec_gis_export %>%  
+ # hec_gis_export %>%  
+  hec_TA_export %>%
   #transform to WGS1984 coordinate system
   st_transform(4326) %>%
   #join with geographic stormwater jurisdictions
@@ -40,7 +41,7 @@ kc_roads_SM<-
             PctGuttered=GutterLen_FT/2/Shape_Leng*100,#percent of road with curb
             RdSkirtPctImp=RdSkirtPctImpervious*100, 
             #percent of road skirt buffer (6-meter on either side of road surface) that is impervious
-            Grade,#road slope
+        #    Grade,#road slope
             RdSkirtPctOverwater=100*as.numeric(ifelse(is.na(RdSkirtPctOverwater),0,RdSkirtPctOverwater)),
             #how much of the road skirt is over water?
             StreamWaterCrossing=ifelse(is.na(StreamWaterCrossing),0,StreamWaterCrossing),

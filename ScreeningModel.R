@@ -101,9 +101,11 @@ kc_roads_score<-kc_roads_SM %>%
             Imputed_SW_RoadwayConnectednessScore=round(ImpScore+ConveyScore_PRED,2),
             #total Score (without and with imputation)
             TotalScore=(GenScore+RoadwayConnectednessScore),
-             TotalScore=ifelse(TotalScore<0,0,TotalScore),
+             TotalScore=ifelse(TotalScore<0,0,
+                               ifelse(TotalScore>5,5,TotalScore)),
            Imputed_SW_Score=GenScore+Imputed_SW_RoadwayConnectednessScore,
-           Imputed_SW_Score=ifelse(Imputed_SW_Score<0,0,Imputed_SW_Score)
+           Imputed_SW_Score=ifelse(Imputed_SW_Score<0,0,
+                                   ifelse(Imputed_SW_Score>5,5,Imputed_SW_Score))
   ) %>%
   #calculate perceniltes
   mutate(ScorePercentile=round(100*rank(TotalScore,ties.method='max',na.last='keep')/(length(which(!is.na(TotalScore)))),1),
