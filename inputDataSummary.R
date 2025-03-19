@@ -16,6 +16,8 @@ kc_roads_SM %>%
   summarise(n=n(),
             AveRoadLength=mean(RoadMiles),
             TotalRoadMiles=sum(RoadMiles),
+            AveRoadArea_Acres=mean(RoadArea_SQFT,na.rm=T)/43560,
+            TotalRoadArea_Acres=sum(RoadArea_SQFT,na.rm=T)/43560,
             AveADT=mean(ADT_PSRC,na.rm=T),
             #  VehicleRoadMiles=sum(RoadMiles*ADT_PSRC,na.rm=T),
             AveMediumVehicles=mean(MediumVehicle,na.rm=T),

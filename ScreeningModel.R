@@ -42,7 +42,8 @@ kc_roads_SM_predConvey<-kc_roads_SM %>%
   # select(-loessModel) %>%
   unnest(cols = c(data, ConveyPct_Predicted)) %>%
   ungroup() %>%
-  select(KC_FCC,RoadSegmentID,ConveyPct_Predicted)
+  group_by(KC_FCC,RoadSegmentID) %>%
+  summarise(ConveyPct_Predicted=mean(ConveyPct_Predicted))
 
 #plot imputed roads by conveyance
 conveyance_by_impervious_FCC_imputed<-kc_roads_SM %>%
@@ -72,6 +73,7 @@ kc_roads_score<-kc_roads_SM %>%
             Juris,
             FULLNAME,RoadSegmentID,KC_FCC,
             RoadMiles,
+            RoadArea_SQFT,
             TrafficIntensity=ifelse(is.na(ADT_PSRC),1,ADT_PSRC),
             HeavyVehicleCount=ifelse(is.na(HeavyVehicle),0,HeavyVehicle),
             MediumVehicleCount=ifelse(is.na(MediumVehicle),0,MediumVehicle),

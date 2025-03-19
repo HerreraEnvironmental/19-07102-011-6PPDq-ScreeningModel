@@ -16,6 +16,12 @@ geo_sw_juris<-read_excel('O:\\proj\\Y2019\\19-07102-011\\GIS\\KC_Street_Address_
 #missing jurisdictions from the aggregrated stormwater dataset
 missing_sw_juris<-c('Carnation','Medina','Yarrow Point','Skykomish')
 
+road_polys<-st_read("\\\\herrera.local\\hecnet\\gis-k\\Projects\\Y2019\\19-07102-011\\Geodatabase\\GIS_Working\\WQBE6ppdq_20240717.gdb" ,
+                    layer='King_County_St_Addresses_6PPDQ_Metrics_RoadPolygons_20240717')
+road_areas<-road_polys %>%
+  st_drop_geometry() %>%
+  group_by(RoadSegmentID) %>%
+  summarise(RoadArea_SQFT=sum(Shape_Area))
 
 kc_roads_SM<-
  # hec_gis_export %>%  
@@ -24,6 +30,7 @@ kc_roads_SM<-
   st_transform(4326) %>%
   #join with geographic stormwater jurisdictions
   left_join(geo_sw_juris) %>%
+  left_join(road_areas) %>%
   transmute(FRADDL,FRADDR,TOADDL,TOADDR,FULLNAME,
             RoadSegmentID, #unique ID for every road segment
             KC_FCC=factor(KC_FCC,levels=c('L','C','M','P','F'),
@@ -79,5 +86,6 @@ kc_roads_SM<-
             ConveyType=if_else(SW_DATA_Available,ConveyType,NA), 
             BusTraffic =ifelse(is.na(BusTraffic ),0,BusTraffic ), #bus route present?
             Shape_Length=Shape_Leng, #feet
-            RoadMiles=Shape_Leng/5280
+            RoadMiles=Shape_Leng/5280,
+            RoadArea_SQFT
   )
