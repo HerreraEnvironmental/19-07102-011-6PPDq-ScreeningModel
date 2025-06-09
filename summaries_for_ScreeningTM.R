@@ -11,7 +11,7 @@ road_scores_info<-st_read('outputs/GIS/kc_roads_scored.geojson') %>% st_drop_geo
   mutate(KC_FCC=factor(KC_FCC,levels=c('Local','Collector','Minor','Primary','Freeway')))
 
 skirts<-st_read(dsn=hec_gdb_work,layer='King_County_St_Addresses_6PPDQ_Metrics_RoadSkirt_20240717') %>%
-  select(RoadSegmentID ) %>%
+  select(RoadSegmentID )
 
 station_drains<-st_read('K:\\Projects\\Y2023\\23-08252-000\\Shape\\Other_Working\\DrainBasins_Merged_Modified_20250325.shp')
 
@@ -189,3 +189,10 @@ ggsave('siteSelection_plots/passVeh_fcc.png',plot=plot_siteSelection_PassengerVe
 ggsave('siteSelection_plots/trucks_fcc.png',plot=plot_siteSelection_trucks_fcc,scale=0.8,width=10,height=4.5)
 ggsave('siteSelection_plots/convey_fcc.png',plot=plot_siteSelection_convey_fcc,scale=0.8,width=10,height=4.5)
 ggsave('siteSelection_plots/skirtImp_fcc.png',plot=plot_siteSelection_rdskirtimp_fcc,scale=0.8,width=10,height=4.5)
+
+
+selected_basins %>%
+  ggplot(aes(PV_LT_Count,HeavyVehicleCount))+
+  geom_point()+
+  scale_x_log10()+
+  scale_y_log10()
