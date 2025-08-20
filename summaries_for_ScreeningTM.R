@@ -13,7 +13,18 @@ road_scores_info<-st_read('outputs/GIS/kc_roads_scored.geojson') %>% st_drop_geo
 skirts<-st_read(dsn=hec_gdb_work,layer='King_County_St_Addresses_6PPDQ_Metrics_RoadSkirt_20240717') %>%
   select(RoadSegmentID )
 
-station_drains<-st_read('K:\\Projects\\Y2023\\23-08252-000\\Shape\\Other_Working\\DrainBasins_Merged_Modified_20250325.shp')
+new_station_drains<-st_read('K:\\Projects\\Y2023\\23-08252-000\\Geodatabase\\GIS_Working\\BasinDelin.gdb',
+                            'DrainBasins_SouthSites_20250819_Poly_V3') %>%
+  transmute(KC_AssetID=c('SNS-8272','SNS-11611')) %>%
+  rename(geometry=Shape) %>%
+  st_transform(2925)
+
+station_drains<-st_read('K:\\Projects\\Y2023\\23-08252-000\\Shape\\Other_Working\\DrainBasins_Merged_Modified_20250325.shp') %>%
+  select(KC_AssetID) %>%
+  filter(KC_AssetID!='NA_WKC_MLKJR'&KC_AssetID!='SNS-29085') %>%
+  st_transform(2925) %>%
+  bind_rows(new_station_drains) 
+
 
 road_polygon_scored<-st_read('outputs/GIS/road_polygon_scored.geojson')
 
